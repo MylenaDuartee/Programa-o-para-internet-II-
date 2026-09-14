@@ -26,6 +26,16 @@
  * ============================================================
  */
 
+//---> TODO 1
+import { Router } from "express";
+import { patientsController } from "../controllers/patients.controller";
+
+export const patientsRouter = Router();
+
+patientsRouter.get('/',patientsController.list);
+patientsRouter.get('/:id',patientsController.getById);
+//post('/',patientsController.create);
+
 /**
  * ============================================================
  * TODO 13 (Encontro 2) -- Rota de upload de foto

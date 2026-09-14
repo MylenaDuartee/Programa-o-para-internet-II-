@@ -29,6 +29,51 @@
  *   };
  * ============================================================
  */
+import { db } from "../db/database.ts";
+
+type PatientRow = {
+  id: number;
+  name: string;
+  birth_date: string;
+  national_id: string;
+  active: number;
+  photo_path: string | null;
+};
+
+function toPatientJson(row: PatientRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    birthDate: row.birth_date,
+    nationalId: row.national_id,
+    active: row.active === 1,
+    photoUrl: row.photo_path,
+  };
+}
+
+
+export const patientsService = {
+    list() {
+        const rows = db
+            .prepare("SELECT id, name, birth_date, national_id, active, photo_path FROM patients ORDER BY name")
+            .all() as PatientRow[];
+        
+        return rows.map(toPatientJson);
+    },
+    getById(id: string) {
+        const row = db
+            .prepare("SELECT id, name, birth_date, national_id, active, photo_path FROM patients WHERE id = ?")
+            .get(id) as PatientRow | undefined;
+
+        if (!row) {
+            return null;
+        }
+
+        return row;
+        
+    },
+    /*create(data: { name: string; birthDate: string; nationalId: string }) { ... },*/
+};
 
 /**
  * ============================================================

@@ -27,6 +27,32 @@
  * ============================================================
  */
 
+//---> TODO 2
+
+import { patientsService } from "../services/patients.service.ts";
+import { Request, Response } from "express";
+
+export const patientsController = {
+    list(_req:Request, res:Response) {
+        const patients = patientsService.list();
+
+        res.status(200).json(patients);
+    },
+    getById(req:Request<{id: string}>, res:Response) {
+        const id = req.params.id;
+
+        const patient = patientsService.getById(id);
+
+    if(!patient){
+        res.status(404).json({
+            error: "Paciente nao encontrado."
+        });
+    }
+        res.status(200).json(patient);
+    },
+    /*create(req, res) { ... },*/
+};
+
 /**
  * ============================================================
  * TODO 13 (Encontro 2, continuacao) -- Controller de upload
