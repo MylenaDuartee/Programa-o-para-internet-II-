@@ -30,6 +30,7 @@
  * ============================================================
  */
 import { db } from "../db/database.ts";
+import { NotFoundError,BadRequestError, ConflictError } from "../errors/HttpError.ts";
 
 type PatientRow = {
   id: number;
@@ -49,6 +50,25 @@ function toPatientJson(row: PatientRow) {
     active: row.active === 1,
     photoUrl: row.photo_path,
   };
+};
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function isBlank(value: unknown): boolean {
+  return typeof value !== "string" || value.trim() === "";
+};
+
+function validatePatientInput(body: any): string | null {
+  if (isBlank(body?.name)) {
+    return "O campo 'name' e obrigatorio e nao pode ser vazio.";
+  }
+  if (isBlank(body?.birthDate) || !ISO_DATE.test(body.birthDate)) {
+    return "O campo 'birthDate' e obrigatorio e deve estar no formato AAAA-MM-DD.";
+  }
+  if (isBlank(body?.nationalId)) {
+    return "O campo 'nationalId' e obrigatorio.";
+  }
+  return null;
 }
 
 
@@ -66,13 +86,41 @@ export const patientsService = {
             .get(id) as PatientRow | undefined;
 
         if (!row) {
-            return null;
+            throw new NotFoundError("Paciente não encontrado");
         }
 
         return row;
         
     },
-    /*create(data: { name: string; birthDate: string; nationalId: string }) { ... },*/
+    create(data: { name: string; birthDate: string; nationalId: string }) {
+        const problem = validatePatientInput(data);
+
+        if (problem) {
+            throw new BadRequestError(problem);
+        }
+
+        const duplicate = db
+            .prepare("SELECT id FROM patients WHERE national_id = ?")
+            .get(data.nationalId.trim());
+
+
+        if (duplicate) {
+            throw new ConflictError("Já existe um paciente com este CNS.");
+        }
+
+        const result = db
+            .prepare(
+            `INSERT INTO patients (name, birth_date, national_id, active)
+            VALUES (?, ?, ?, 1)`
+            )
+            .run(data.name.trim(), data.birthDate, data.nationalId.trim());
+
+        const created = db
+            .prepare("SELECT id, name, birth_date, national_id, active, photo_path FROM patients WHERE id = ?")
+            .get(result.lastInsertRowid) as PatientRow;
+
+        return toPatientJson(created);
+    }
 };
 
 /**

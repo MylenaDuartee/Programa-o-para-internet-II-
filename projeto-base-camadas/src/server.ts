@@ -38,6 +38,7 @@ app.get("/api/health", (_request, response) => {
    PATIENTS -- implementacao atual (flat, sem camadas)
    ============================================================ */
 
+/*
 type PatientRow = {
   id: number;
   name: string;
@@ -78,7 +79,7 @@ function validatePatientInput(body: any): string | null {
 }
 
 /** Lista todos os pacientes. */
-app.get("/api/patients", (_request, response) => {
+/*app.get("/api/patients", (_request, response) => {
   const rows = db
     .prepare("SELECT id, name, birth_date, national_id, active, photo_path FROM patients ORDER BY name")
     .all() as PatientRow[];
@@ -87,7 +88,7 @@ app.get("/api/patients", (_request, response) => {
 });
 
 /** Busca um paciente pelo id. */
-app.get("/api/patients/:id", (request, response) => {
+/*app.get("/api/patients/:id", (request, response) => {
   const row = db
     .prepare("SELECT id, name, birth_date, national_id, active, photo_path FROM patients WHERE id = ?")
     .get(request.params.id) as PatientRow | undefined;
@@ -101,7 +102,7 @@ app.get("/api/patients/:id", (request, response) => {
 });
 
 /** Cria um paciente. */
-app.post("/api/patients", (request, response) => {
+/*app.post("/api/patients", (request, response) => {
   const problem = validatePatientInput(request.body);
 
   if (problem) {
@@ -140,7 +141,7 @@ app.post("/api/patients", (request, response) => {
    ENCOUNTERS -- implementacao atual (flat, sem camadas)
    ============================================================ */
 
-type EncounterRow = {
+/*type EncounterRow = {
   id: number;
   patient_id: number;
   started_at: string;
@@ -165,7 +166,7 @@ function patientExists(id: string): boolean {
 }
 
 /** Lista os atendimentos de um paciente, do mais recente para o mais antigo. */
-app.get("/api/patients/:id/encounters", (request, response) => {
+/*app.get("/api/patients/:id/encounters", (request, response) => {
   if (!patientExists(request.params.id)) {
     response.status(404).json({ error: "Paciente nao encontrado." });
     return;
@@ -184,7 +185,7 @@ app.get("/api/patients/:id/encounters", (request, response) => {
 });
 
 /** Registra um atendimento. */
-app.post("/api/patients/:id/encounters", (request, response) => {
+/*app.post("/api/patients/:id/encounters", (request, response) => {
   if (!patientExists(request.params.id)) {
     response.status(404).json({ error: "Paciente nao encontrado." });
     return;
@@ -219,7 +220,15 @@ app.post("/api/patients/:id/encounters", (request, response) => {
 
   response.status(201).json(toEncounterJson(created));
 });
+*/
 
+import { patientsRouter } from "./routes/patients.routes.ts";
+import { encountersRouter } from "./routes/encounters.routes.ts";
+import { errorHandler } from "./middlewares/errorHandler.ts";
+
+app.use("/api/patients", patientsRouter);
+app.use("/api/patients/:id/encounters", encountersRouter);
+app.use(errorHandler);
 /* ============================================================
    TODO 7 (depois de TODO 1-6 prontos em routes/controllers/services)
    ------------------------------------------------------------

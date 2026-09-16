@@ -17,3 +17,21 @@
  *   };
  * ============================================================
  */
+
+import { Request, Response } from "express";
+import { encountersService } from "../services/encounters.service.ts";
+
+export const encountersController = {
+    list(req:Request <{ id: string }>, res:Response) {
+        const patientId = req.params.id;
+        const encounters = encountersService.list(patientId);
+
+        res.status(200).json(encounters);
+    },
+    create(req:Request<{ id: string }>, res:Response) {
+        const patientId = req.params.id;
+        const encounter = encountersService.create(patientId,req.body);
+
+        res.status(201).json(encounter);
+    }
+};

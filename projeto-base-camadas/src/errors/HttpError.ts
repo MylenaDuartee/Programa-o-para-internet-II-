@@ -17,3 +17,22 @@
  * os retornos especiais de erro por `throw new AlgumHttpError()`.
  * ============================================================
  */
+
+export class HttpError extends Error { 
+    constructor(public statusCode: number, message: string, public details?: unknown) { super(message);} 
+}
+export class BadRequestError extends HttpError  {
+    constructor(msg = 'Requisição inválida', details?: unknown) { super(400,msg,details);}
+}        
+export class NotFoundError extends HttpError{
+    constructor(msg = 'Recurso não encontrado') { super(404,msg); }
+}         
+export class ConflictError extends HttpError{
+    constructor(msg = 'Conflito com o estado atual') { super(409,msg);}
+}            
+export class UnprocessableEntityError extends HttpError{
+    constructor(msg = 'Não foi possível processar',details?: unknown) { super(422,msg,details);}
+} 
+export class PayloadTooLargeError extends HttpError{
+    constructor(msg = 'Arquivo excede o tamanho permitido') { super(413,msg);}
+} 

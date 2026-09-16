@@ -34,6 +34,7 @@ export const patientsRouter = Router();
 
 patientsRouter.get('/',patientsController.list);
 patientsRouter.get('/:id',patientsController.getById);
+patientsRouter.post('/',patientsController.create);
 //post('/',patientsController.create);
 
 /**
