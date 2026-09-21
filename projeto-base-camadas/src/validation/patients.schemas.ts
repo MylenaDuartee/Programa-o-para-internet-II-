@@ -12,3 +12,13 @@
  *   patientsRouter.post("/", validate(createPatientSchema), patientsController.create);
  * ============================================================
  */
+import { z } from 'zod';
+
+export const createPatientSchema = z.object({
+    name: z.string().min(1, 'nome obrigatório'),
+    birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/,'data de nascimento deve estar no formato AAAA-MM-DD'),
+    nationalId: z.string()
+});
+
+
+export type CreatePatientInput = z.infer<typeof createPatientSchema>;

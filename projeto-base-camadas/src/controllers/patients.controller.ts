@@ -31,6 +31,7 @@
 
 import { patientsService } from "../services/patients.service.ts";
 import { Request, Response } from "express";
+import { UnprocessableEntityError } from "../errors/HttpError.ts";
 
 export const patientsController = {
     list(_req:Request, res:Response) {
@@ -61,3 +62,4 @@ export const patientsController = {
  *   - responde 200 com o paciente atualizado
  * ============================================================
  */
+
